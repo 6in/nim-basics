@@ -1,0 +1,18 @@
+{
+    "version": "0.1.0",
+    "command": "nim",
+    "args": [
+        "c",
+        "--out:debug/${fileBasename}",
+        "-r",
+        "${file}",
+        "abc",
+        "--foo=a",
+        "--bar=b",
+        "-hoge:c"
+    ],
+    "options": {
+        "cwd": "${workspaceRoot}"
+    },
+    "isShellCommand": true
+}
