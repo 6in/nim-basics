@@ -5,11 +5,12 @@
         "c",
         "--out:debug/${fileBasename}.exe",
         "-r",
+        "--threads:on",
         "${file}",
-        "abc",
+        "${workspaceRoot}/hello.txt",
         "--foo=a",
         "--bar=b",
-        "-hoge:c"
+        "-hoge:6in"
     ],
     "options": {
         "cwd": "${workspaceRoot}"
