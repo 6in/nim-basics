@@ -13,12 +13,14 @@ proc get_ext_list_impl(startPath:string): Table[string,int] =
   for f in startPath.walkDirRec :
     if f.existsFile :
       let (_,_,ext) = f.splitFile
-      if ext == "" : continue
+      var ext2 = ext
+      if ext == "" :
+        ext2 = "noext"
       # 既に格納されているか確認
-      if result.contains(ext) == false :
-        result[ext] = 0
+      if result.contains(ext2) == false :
+        result[ext2] = 0
       # カウントアップ
-      result[ext] += 1
+      result[ext2] += 1
 
 # メイン関数
 proc main(args:seq[string]):int =
