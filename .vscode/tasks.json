@@ -3,7 +3,7 @@
     "command": "nim",
     "args": [
         "c",
-        "--out:debug/${fileBasename}",
+        "--out:debug/${fileBasename}.exe",
         "-r",
         "${file}",
         "abc",

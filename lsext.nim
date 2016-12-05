@@ -4,6 +4,7 @@ import os
 import tables
 import algorithm
 import future
+import strutils
 
 # 指定フォルダを再帰で探索し、(拡張子：個数)を返却する
 proc get_ext_list_impl(startPath:string): Table[string,int] =
@@ -12,8 +13,12 @@ proc get_ext_list_impl(startPath:string): Table[string,int] =
   # 再帰で探索
   for f in startPath.walkDirRec :
     if f.existsFile :
-      let (_,_,ext) = f.splitFile
+      let (p,_,ext) = f.splitFile
       var ext2 = ext
+      # dotから始まるフォルダが含まれていたらスキップする
+      if p.find("/.") >= 0 :
+        continue
+      # 拡張子なしもカウントする
       if ext == "" :
         ext2 = "noext"
       # 既に格納されているか確認
