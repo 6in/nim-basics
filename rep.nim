@@ -1,11 +1,9 @@
-# 通常のコマンドラインアプリサンプル その２
+# ファイル内の文字列置換ツール
 
 import os
 import parseopt2
 import tables
 import queues
-import sequtils
-import lists
 import strutils
 
 proc rep_files(files:Queue[string],params:Table[string,string]) : bool =
