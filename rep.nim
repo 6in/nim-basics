@@ -8,21 +8,20 @@ import sequtils
 import lists
 import strutils
 
-proc rep_files(files:Queue[string],params:Table[string,string]) : bool =
-  result = true
-  # ファイルを取り出す
-  let f:string = files[0]
+# 置換処理を行う
+proc rep_files(file:string,params:Table[string,string]) : int =
+  result = 0
   # ファイルの存在チェック
-  if f.existsFile :
+  if file.existsFile :
     # ファイルを１行ずつ読み込む
-    for line in f.lines() :
+    for line in file.lines :
       var work = line
       # パラメータで置換する
       for k,v in params :
         work = work.replace(k,v)
       echo work
   else: 
-    result = false
+    result = 1
 
 # メインモジュールとして起動しているかチェック
 if isMainModule :
@@ -47,4 +46,5 @@ if isMainModule :
     of cmdEnd:
       discard
   
-  discard rep_files(files,params)
+  # 置換処理を呼び出す
+  quit(rep_files(files[0],params))
