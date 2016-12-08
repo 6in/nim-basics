@@ -1,3 +1,9 @@
+# nimによる2Way-SQL対応 PostgreSQLクライアント
+# ex)
+# ./p -h=localhost -port=5432 -db=sample -u=postgres -p=postgres -i="test.sql" -Pname=abc -Pname2=ghi
+
+import os
+import parseopt2
 import db_postgres
 import tables
 import nre
@@ -33,27 +39,60 @@ proc initSql2WayInfo( str:string , params: Table[string,string] ) : Sql2WayInfo 
 proc p(info:Sql2WayInfo, params:Table[string,string]) : seq[string] = 
   info.keys.mapIt( if it in params : params[it] else: "" ) 
 
-let rawSql = """
-select 
-  name,'hello' as name2
-from 
-  test 
-where 1=1
-and name = /*name*/'abc'
-or  name in ( /*name2*/'def' , /*name3*/'ghi' ) 
-"""
-
-var params = initTable[string,string]()
-params["name"] = "abc"
-params["name2"] = "def"
-echo params.len
-
-var qp = initSql2WayInfo(rawSql,params)
-
-block :
-  let db = open("", "postgres", "postgres", "host=localhost port=5432 dbname=sample")
+# メイン処理
+proc mainProc(args:Table[string,string],params:Table[string,string]) : int =
+  result = 0
+  # 2WaySqlをパース
+  var qp = initSql2WayInfo(args["sql"],params)
+  # 接続文字列の組み立て
+  let conn = "host=" & args["host"] & " port=" & args["port"] & " dbname=" & args["db"]
+  # Postgresqlに接続
+  let db = open("", args["user"], args["password"], conn )
   defer:
     db.close
+  # パラメータを指定して実行
   for row in db.fastRows( SqlQuery(qp.query) , qp.p(params)) :
     echo row.join("\t")
-quit(0)
+
+# メインモジュールとして起動しているかチェック
+if isMainModule :
+  var args = initTable[string,string]()
+  var prms = initTable[string,string]()
+  args["host"] = "localhost"
+  args["port"] = "5432"
+
+  # イテレータで取得    
+  for kind, key, val in getopt() :
+    # (余談)kindは、enum型なので、case文ではすべてのenum値
+    # を網羅していないとコンパイルエラーとなります
+    case kind
+    of cmdEnd:
+      discard
+    of cmdArgument:
+      echo "無効な引数です"
+      quit(1)
+    of cmdLongOption, cmdShortOption:
+      var val2 = val
+      let key2 = case key
+        of "h","host": "host"
+        of "u","user": "user"
+        of "p","password": "password"
+        of "d","db" : "db"
+        of "c","sql": "sql"
+        of "port" : "port"
+        of "i","file": 
+          var buff = @[""]
+          # ファイルを読み込む
+          for x in val.lines() :
+            buff.add(x)
+          val2 = buff.join("\n")
+          "sql"
+        else:
+          if key[0] == 'P' :
+            prms[ key.substr(1)  ] = val
+          ""
+      if key2 != "" :
+        args[key2] = val2 
+
+  # メイン処理を呼び出し
+  quit(mainProc(args,prms))
