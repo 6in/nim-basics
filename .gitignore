@@ -2,3 +2,4 @@ Rkz
 nimcache
 debug
 *.log
+*.out
