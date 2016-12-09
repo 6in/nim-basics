@@ -7,10 +7,13 @@
         "-r",
         "--threads:on",
         "${file}",
-        "${workspaceRoot}/hello.txt",
-        "--foo=a",
-        "--bar=b",
-        "-hoge:6in"
+        "-h=localhost",
+        "-u=postgres",
+        "-p=postgres",
+        "-port=5432",
+        "-i=test.sql",
+        "-db=sample",
+        "-pname=abc"
     ],
     "options": {
         "cwd": "${workspaceRoot}"
